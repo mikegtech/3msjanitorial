@@ -11,11 +11,14 @@ This document provides context for AI coding agents working on the 3MS Janitoria
 **Current State (Phase 1)**: Web app complete with all pages, routing, theming, and contact form with Zod validation. Form submissions stored in localStorage pending API. Contracts package exports Lead and Schedule schemas used across apps.
 
 **Key Files**:
-- `apps/web/src/App.tsx` - Main router with all page routes
-- `apps/web/src/theme.ts` - MUI theme (primary blue, secondary green)
+- `apps/web/src/App.tsx` - Main router with lazy-loaded Schedule route
+- `apps/web/src/theme.ts` - MUI theme with brand colors (navy #002080, gold #A09060)
 - `apps/web/src/pages/Contact.tsx` - Quote form with Zod validation
+- `apps/web/src/pages/Schedule.tsx` - Schedule preview with JSON editor and calendar
+- `apps/web/src/components/calendar/CalendarThemeShell.tsx` - MUI-styled FullCalendar wrapper
+- `apps/web/src/utils/scheduleAdapter.ts` - Transform schedule JSON to FullCalendar events
 - `packages/contracts/src/lead.ts` - Lead/quote request schema
-- `packages/contracts/src/schedule.ts` - Calendar event schema with RRULE support
+- `packages/contracts/src/schedule.ts` - Calendar event schema with RRULE support + ScheduleImportSchema
 - `turbo.json` - Build pipeline configuration
 - `biome.json` - Lint and format rules
 
@@ -43,10 +46,14 @@ This document provides context for AI coding agents working on the 3MS Janitoria
 - [ ] Admin authentication (basic JWT)
 - [ ] Connect web form to API
 
-### Phase 3: Calendar + Scheduling
-- [ ] FullCalendar integration in web app with MUI theming
-- [ ] rrule plugin for recurring events
-- [ ] Schedule/event API endpoints
+### Phase 3: Calendar + Scheduling (IN PROGRESS)
+- [x] FullCalendar integration in web app with MUI theming
+- [x] rrule plugin for recurring events
+- [x] Schedule Preview page (/schedule) for JSON import/validation
+- [x] CalendarThemeShell component with brand color integration
+- [x] ScheduleImportSchema for validating imported JSON
+- [x] Lazy-loaded route to keep initial bundle small
+- [ ] Schedule/event API endpoints (Phase 2 dependency)
 - [ ] Client portal for viewing scheduled cleanings
 - [ ] Admin dashboard for managing schedule
 
@@ -69,10 +76,10 @@ This document provides context for AI coding agents working on the 3MS Janitoria
 
 ## Non-Goals for Current Phase
 
-- **No backend API**: Form submissions go to localStorage only
+- **No backend API**: Form submissions and schedules go to localStorage only
 - **No database**: Data persistence is client-side only
 - **No authentication**: No login/signup functionality
-- **No calendar UI**: Schema ready but UI is Phase 3
+- **No schedule editing**: Calendar is view-only, editing comes with Phase 3 admin
 - **No chatbot**: Agent service is Phase 4
 - **No deployment**: Local development only
 - **No email sending**: Notifications come with API in Phase 2
@@ -133,12 +140,15 @@ apps/
 - ES2022 target, ESNext modules
 - Path aliases: `@/*` maps to `./src/*` in web app
 
-### MUI Theme
-- Primary: Blue (#1565C0) - trust, professionalism
-- Secondary: Green (#2E7D32) - action buttons, CTAs
+### MUI Theme (Brand Colors)
+- Primary Navy: #002080 - trust, professionalism (from logo)
+- Deep Blue: #000040 - gradients, dark accents
+- Accent Gold: #A09060 - highlights, recurring events
+- Light Wash: #C0E0E0 - today highlight, subtle backgrounds
 - Typography: Inter for body, Poppins for headings
-- Border radius: 8px standard
-- Button shadows for depth on primary actions
+- Border radius: 12px standard
+- Gradient buttons with colored shadows
+- Aurora-style visual polish with hover effects
 
 ### Form Handling
 - Controlled components with React state

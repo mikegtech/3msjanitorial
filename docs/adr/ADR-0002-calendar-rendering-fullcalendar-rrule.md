@@ -2,11 +2,12 @@
 
 ## Status
 
-Accepted (implementation planned for Phase 3)
+**Implemented** (Schedule Preview feature complete)
 
 ## Date
 
-2026-01-19
+2026-01-19 (originally planned)
+2026-01-19 (implemented)
 
 ## Context
 
@@ -142,20 +143,38 @@ const calendarStyles = {
 - Will need to handle timezone considerations
 - Exception handling for recurring events needs careful design
 
-## Implementation Notes (for Phase 3)
+## Implementation Details
 
 ### Package installation
 ```bash
-pnpm add @fullcalendar/core @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/list @fullcalendar/rrule rrule
+pnpm --filter @3msjanitorial/web add @fullcalendar/core @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction @fullcalendar/rrule rrule
 ```
 
-### Key components to create
-- `Calendar.tsx` - Main calendar component
-- `CalendarToolbar.tsx` - MUI-based toolbar
-- `EventCard.tsx` - Custom event rendering
-- `RecurrenceEditor.tsx` - UI for creating rrule patterns
+### Implemented components
+- `Schedule.tsx` - Full page with JSON editor and calendar
+- `CalendarThemeShell.tsx` - MUI-themed wrapper with CSS variables
+- `scheduleAdapter.ts` - Transform ScheduleImport to FullCalendar EventInput
 
-### API endpoints needed (Phase 2/3)
+### Schema additions (packages/contracts/src/schedule.ts)
+- `ImportEventSchema` - One-off events for import
+- `ImportRecurringEventSchema` - Recurring events with RRULE strings
+- `ScheduleImportSchema` - Top-level schedule with timezone, events, recurring
+- `exampleScheduleImport` - Sample janitorial schedule
+
+### MUI Theming Approach
+The `CalendarThemeShell` component:
+1. Wraps FullCalendar in a styled div with class `.fc-mui`
+2. Sets CSS custom properties from MUI theme (`--fc-*` variables)
+3. Overrides FullCalendar button styles to match MUI buttons
+4. Applies brand colors (navy #002080, gold #A09060)
+5. Uses `Number(theme.shape.borderRadius)` for calculations
+
+### Performance
+- Schedule route is lazy-loaded with React.lazy() and Suspense
+- FullCalendar plugins tree-shake well
+- Initial marketing bundle unaffected by calendar code
+
+### Future API endpoints (Phase 2/3)
 - `GET /events` - Fetch events for date range
 - `POST /events` - Create event (with optional rrule)
 - `PUT /events/:id` - Update event

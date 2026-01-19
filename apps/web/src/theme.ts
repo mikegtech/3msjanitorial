@@ -2,50 +2,63 @@ import { alpha, createTheme } from '@mui/material/styles';
 
 // =============================================================================
 // COLOR PALETTE
-// Aurora-inspired with professional service-industry tones
+// Brand colors derived from 3M's Janitorial Service logo
 // =============================================================================
+
+// Brand tokens from logo
+export const brandColors = {
+  navy: '#002080', // Primary navy from logo
+  deep: '#000040', // Deep blue for gradients
+  accent: '#A09060', // Gold accent stripes
+  lightWash: '#C0E0E0', // Light blue wash background
+  neutrals: {
+    light: '#E0E0E0',
+    medium: '#C0C0C0',
+    dark: '#808080',
+  },
+};
 
 const palette = {
   primary: {
-    main: '#1565C0',
-    light: '#42a5f5',
-    dark: '#0d47a1',
-    50: '#e3f2fd',
-    100: '#bbdefb',
-    200: '#90caf9',
-    300: '#64b5f6',
-    400: '#42a5f5',
-    500: '#1565C0',
-    600: '#1565C0',
-    700: '#1976d2',
-    800: '#1565c0',
-    900: '#0d47a1',
+    main: brandColors.navy,
+    light: '#1a4090',
+    dark: brandColors.deep,
+    50: '#e6eaf5',
+    100: '#c0cce6',
+    200: '#97abd6',
+    300: '#6d8ac6',
+    400: '#4d71b9',
+    500: brandColors.navy,
+    600: '#001c70',
+    700: '#001860',
+    800: '#001450',
+    900: brandColors.deep,
     contrastText: '#ffffff',
   },
   secondary: {
-    main: '#2e7d32',
-    light: '#4caf50',
-    dark: '#1b5e20',
-    50: '#e8f5e9',
-    100: '#c8e6c9',
-    200: '#a5d6a7',
-    300: '#81c784',
-    400: '#66bb6a',
-    500: '#4caf50',
-    600: '#43a047',
-    700: '#388e3c',
-    800: '#2e7d32',
-    900: '#1b5e20',
+    main: brandColors.accent,
+    light: '#b8a878',
+    dark: '#887848',
+    50: '#f5f3ed',
+    100: '#e8e4d5',
+    200: '#d8d0b8',
+    300: '#c8bc9a',
+    400: '#bcac84',
+    500: brandColors.accent,
+    600: '#908050',
+    700: '#807040',
+    800: '#706030',
+    900: '#504820',
     contrastText: '#ffffff',
   },
   grey: {
     50: '#fafafa',
     100: '#f5f5f5',
-    200: '#eeeeee',
-    300: '#e0e0e0',
-    400: '#bdbdbd',
-    500: '#9e9e9e',
-    600: '#757575',
+    200: brandColors.neutrals.light,
+    300: '#d0d0d0',
+    400: brandColors.neutrals.medium,
+    500: '#a0a0a0',
+    600: brandColors.neutrals.dark,
     700: '#616161',
     800: '#424242',
     900: '#212121',
@@ -245,18 +258,22 @@ export const theme = createTheme({
           scrollBehavior: 'smooth',
         },
         body: {
-          // CSS custom properties for FullCalendar theming (Phase 3)
+          // CSS custom properties for FullCalendar theming
           '--fc-border-color': palette.grey[200],
-          '--fc-button-bg-color': palette.primary.main,
-          '--fc-button-border-color': palette.primary.main,
-          '--fc-button-hover-bg-color': palette.primary.dark,
-          '--fc-button-hover-border-color': palette.primary.dark,
-          '--fc-button-active-bg-color': palette.primary.dark,
-          '--fc-event-bg-color': palette.primary.main,
-          '--fc-event-border-color': palette.primary.main,
-          '--fc-today-bg-color': alpha(palette.primary.main, 0.08),
+          '--fc-button-bg-color': brandColors.navy,
+          '--fc-button-border-color': brandColors.navy,
+          '--fc-button-hover-bg-color': brandColors.deep,
+          '--fc-button-hover-border-color': brandColors.deep,
+          '--fc-button-active-bg-color': brandColors.deep,
+          '--fc-event-bg-color': brandColors.navy,
+          '--fc-event-border-color': brandColors.deep,
+          '--fc-event-text-color': '#ffffff',
+          '--fc-today-bg-color': alpha(brandColors.lightWash, 0.4),
           '--fc-neutral-bg-color': palette.grey[50],
           '--fc-page-bg-color': '#ffffff',
+          '--fc-highlight-color': alpha(brandColors.accent, 0.2),
+          // Brand accent for recurring events
+          '--fc-recurring-event-bg-color': brandColors.accent,
         },
       },
     },
