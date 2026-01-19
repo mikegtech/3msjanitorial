@@ -141,6 +141,103 @@ Both CTAs should be visible on every page.
 - Minimal JavaScript bundle
 - Static site can be cached aggressively
 
+## Visual Design System
+
+### Aurora-Style Theme Principles
+
+The theme follows Aurora-style design principles for a polished, modern feel:
+
+#### Color Strategy
+- **Primary Blue (#1565C0)**: Trust, professionalism - used for primary actions and branding
+- **Secondary Green (#2E7D32)**: Action, growth - used for CTAs and success states
+- **Graduated palette**: Each color has `light`, `main`, `dark` variants for hierarchy
+- **Alpha transparency**: Use `alpha()` utility for overlays and subtle backgrounds
+
+#### Typography Hierarchy
+- **Display/H1**: Poppins Bold - High impact hero headlines
+- **H2-H4**: Poppins SemiBold - Section headers with clear hierarchy
+- **Body**: Inter - Optimized for screen readability
+- **Overline**: Used for section labels (e.g., "OUR SERVICES", "TESTIMONIALS")
+
+#### Motion & Transitions
+- **Standard timing**: 200ms for most interactions (hover, focus)
+- **Entry animations**: 400-800ms with staggered delays for cards/lists
+- **Easing**: ease-in-out for natural feel
+- **Components used**: MUI `Fade`, `Grow` for section entry animations
+
+#### Elevation & Depth
+- **Cards at rest**: Subtle border + light shadow
+- **Cards on hover**: Increased shadow + slight `translateY(-2px)`
+- **Buttons**: Gradient backgrounds with colored drop shadows
+- **Header**: Scroll-aware backdrop blur with progressive opacity
+
+### Extending the Theme Safely
+
+#### Adding New Colors
+```typescript
+// In theme.ts palette section
+customColor: {
+  light: '#...',
+  main: '#...',
+  dark: '#...',
+  contrastText: '#fff',
+},
+```
+
+#### Adding Component Overrides
+```typescript
+// In theme.ts components section
+MuiNewComponent: {
+  styleOverrides: {
+    root: ({ theme }) => ({
+      // Use theme tokens, never hardcode values
+      color: theme.palette.text.primary,
+      transition: theme.transitions.create(['property'], {
+        duration: theme.transitions.duration.short,
+      }),
+    }),
+  },
+},
+```
+
+#### Animation Guidelines
+```typescript
+// Fade for content entry
+<Fade in timeout={600}>
+  <Box>Content</Box>
+</Fade>
+
+// Grow for cards with staggered delay
+{items.map((item, index) => (
+  <Grow in timeout={400 + index * 100} key={item.id}>
+    <Card>{item.content}</Card>
+  </Grow>
+))}
+```
+
+#### Do's and Don'ts
+- **Do**: Use theme tokens (`theme.palette.X`, `theme.spacing(X)`)
+- **Do**: Use `alpha()` for transparent colors
+- **Do**: Use theme transitions for consistent timing
+- **Don't**: Hardcode colors, spacing, or timing values
+- **Don't**: Add external animation libraries (MUI has what we need)
+- **Don't**: Override MUI's built-in accessibility features
+
+### FullCalendar Theming (Phase 3)
+
+CSS custom properties are already defined in the theme for future FullCalendar integration:
+
+```css
+--fc-border-color          /* Calendar grid lines */
+--fc-button-bg-color       /* Toolbar buttons */
+--fc-button-hover-bg-color /* Button hover state */
+--fc-event-bg-color        /* Event backgrounds */
+--fc-event-text-color      /* Event text */
+--fc-today-bg-color        /* Today highlight */
+```
+
+Wrap FullCalendar in a styled component that maps MUI theme to these variables.
+
 ## Future UX Enhancements
 
 ### Phase 2

@@ -13,16 +13,20 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  alpha,
   Avatar,
   Box,
   Button,
   Card,
   CardContent,
   Container,
+  Fade,
   Grid,
+  Grow,
   Paper,
   Rating,
   Typography,
+  useTheme,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { BUSINESS_INFO, TRUST_BADGES } from '../constants/business';
@@ -55,10 +59,10 @@ const services = [
 ];
 
 const trustIcons = [
-  <SecurityIcon key="security" sx={{ fontSize: 36, color: 'primary.main' }} />,
-  <VerifiedUserIcon key="verified" sx={{ fontSize: 36, color: 'primary.main' }} />,
-  <CleaningServicesIcon key="cleaning" sx={{ fontSize: 36, color: 'primary.main' }} />,
-  <CheckCircleIcon key="check" sx={{ fontSize: 36, color: 'primary.main' }} />,
+  <SecurityIcon key="security" sx={{ fontSize: 36 }} />,
+  <VerifiedUserIcon key="verified" sx={{ fontSize: 36 }} />,
+  <CleaningServicesIcon key="cleaning" sx={{ fontSize: 36 }} />,
+  <CheckCircleIcon key="check" sx={{ fontSize: 36 }} />,
 ];
 
 const reviews = [
@@ -116,140 +120,218 @@ const faqs = [
 ];
 
 export function Home() {
+  const theme = useTheme();
+
   return (
     <>
+      {/* Hero Section */}
       <Box
         sx={{
-          bgcolor: 'primary.main',
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 50%, ${alpha(theme.palette.primary.light, 0.9)} 100%)`,
           color: 'white',
-          py: { xs: 8, md: 12 },
+          py: { xs: 10, md: 14 },
           position: 'relative',
           overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              'radial-gradient(circle at 70% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+            pointerEvents: 'none',
+          },
         }}
       >
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
             <Grid size={{ xs: 12, md: 7 }}>
-              <Typography
-                variant="h1"
-                sx={{
-                  fontSize: { xs: '2.25rem', md: '3.5rem' },
-                  mb: 2,
-                }}
-              >
-                Commercial Cleaning You Can Trust
-              </Typography>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 400,
-                  mb: 4,
-                  opacity: 0.95,
-                  fontSize: { xs: '1.1rem', md: '1.35rem' },
-                }}
-              >
-                Professional janitorial services for businesses in Greenville, TX and surrounding
-                areas. Reliable, thorough, and customized to your needs.
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="large"
-                  component={Link}
-                  to="/contact"
-                  endIcon={<ArrowForwardIcon />}
-                  sx={{ px: 4, py: 1.5 }}
-                >
-                  Request a Quote
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  component="a"
-                  href={`tel:${BUSINESS_INFO.phone}`}
-                  startIcon={<PhoneIcon />}
+              <Fade in timeout={600}>
+                <Box>
+                  <Typography
+                    variant="h1"
+                    sx={{
+                      fontSize: { xs: '2.5rem', sm: '3rem', md: '3.75rem' },
+                      mb: 3,
+                      textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    }}
+                  >
+                    Commercial Cleaning You Can Trust
+                  </Typography>
+                </Box>
+              </Fade>
+              <Fade in timeout={800} style={{ transitionDelay: '100ms' }}>
+                <Typography
+                  variant="h5"
                   sx={{
-                    px: 4,
-                    py: 1.5,
-                    color: 'white',
-                    borderColor: 'white',
-                    '&:hover': {
-                      borderColor: 'white',
-                      bgcolor: 'rgba(255,255,255,0.1)',
-                    },
+                    fontWeight: 400,
+                    mb: 4,
+                    opacity: 0.95,
+                    fontSize: { xs: '1.1rem', md: '1.35rem' },
+                    lineHeight: 1.6,
                   }}
                 >
-                  {BUSINESS_INFO.phoneFormatted}
-                </Button>
-              </Box>
+                  Professional janitorial services for businesses in Greenville, TX and surrounding
+                  areas. Reliable, thorough, and customized to your needs.
+                </Typography>
+              </Fade>
+              <Fade in timeout={1000} style={{ transitionDelay: '200ms' }}>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                    component={Link}
+                    to="/contact"
+                    endIcon={<ArrowForwardIcon />}
+                    sx={{ px: 4, py: 1.5 }}
+                  >
+                    Request a Quote
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    component="a"
+                    href={`tel:${BUSINESS_INFO.phone}`}
+                    startIcon={<PhoneIcon />}
+                    sx={{
+                      px: 4,
+                      py: 1.5,
+                      color: 'white',
+                      borderColor: 'rgba(255,255,255,0.5)',
+                      borderWidth: 2,
+                      '&:hover': {
+                        borderColor: 'white',
+                        borderWidth: 2,
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                      },
+                    }}
+                  >
+                    {BUSINESS_INFO.phoneFormatted}
+                  </Button>
+                </Box>
+              </Fade>
             </Grid>
           </Grid>
         </Container>
       </Box>
 
-      <Box sx={{ py: { xs: 4, md: 6 }, bgcolor: 'grey.50' }}>
+      {/* Trust Badges */}
+      <Box sx={{ py: { xs: 5, md: 7 }, bgcolor: 'grey.50' }}>
         <Container maxWidth="lg">
           <Grid container spacing={3}>
             {TRUST_BADGES.map((badge, index) => (
               <Grid key={badge.title} size={{ xs: 6, md: 3 }}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 3,
-                    textAlign: 'center',
-                    bgcolor: 'white',
-                    height: '100%',
-                    border: '1px solid',
-                    borderColor: 'grey.200',
-                  }}
-                >
-                  {trustIcons[index]}
-                  <Typography variant="h6" sx={{ mt: 1.5, mb: 0.5, fontSize: '1rem' }}>
-                    {badge.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {badge.description}
-                  </Typography>
-                </Paper>
+                <Grow in timeout={400 + index * 100}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 3,
+                      textAlign: 'center',
+                      bgcolor: 'white',
+                      height: '100%',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 3,
+                      transition: theme.transitions.create(
+                        ['border-color', 'box-shadow', 'transform'],
+                        { duration: theme.transitions.duration.short }
+                      ),
+                      '&:hover': {
+                        borderColor: alpha(theme.palette.primary.main, 0.3),
+                        boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.12)}`,
+                        transform: 'translateY(-2px)',
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        color: 'primary.main',
+                        mb: 1.5,
+                        display: 'flex',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {trustIcons[index]}
+                    </Box>
+                    <Typography variant="h6" sx={{ mb: 0.5, fontSize: '1rem' }}>
+                      {badge.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {badge.description}
+                    </Typography>
+                  </Paper>
+                </Grow>
               </Grid>
             ))}
           </Grid>
         </Container>
       </Box>
 
-      <Box sx={{ py: { xs: 6, md: 10 } }}>
+      {/* Services Section */}
+      <Box sx={{ py: { xs: 8, md: 12 } }}>
         <Container maxWidth="lg">
-          <Typography variant="h2" align="center" gutterBottom>
-            Our Services
-          </Typography>
-          <Typography
-            variant="body1"
-            align="center"
-            color="text.secondary"
-            sx={{ mb: 6, maxWidth: 700, mx: 'auto' }}
-          >
-            From small offices to large industrial facilities, we deliver consistent, high-quality
-            cleaning tailored to your specific industry and requirements.
-          </Typography>
+          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
+            <Typography
+              variant="overline"
+              sx={{ color: 'primary.main', display: 'block', mb: 1 }}
+            >
+              What We Offer
+            </Typography>
+            <Typography variant="h2" gutterBottom>
+              Our Services
+            </Typography>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ maxWidth: 700, mx: 'auto' }}
+            >
+              From small offices to large industrial facilities, we deliver consistent, high-quality
+              cleaning tailored to your specific industry and requirements.
+            </Typography>
+          </Box>
           <Grid container spacing={4}>
-            {services.map((service) => (
+            {services.map((service, index) => (
               <Grid key={service.title} size={{ xs: 12, sm: 6, md: 3 }}>
-                <Card sx={{ height: '100%', textAlign: 'center', p: 2 }}>
-                  <CardContent>
-                    <Box sx={{ color: 'primary.main', mb: 2 }}>{service.icon}</Box>
-                    <Typography variant="h6" gutterBottom>
-                      {service.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {service.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <Grow in timeout={400 + index * 100}>
+                  <Card
+                    sx={{
+                      height: '100%',
+                      textAlign: 'center',
+                      cursor: 'default',
+                    }}
+                  >
+                    <CardContent>
+                      <Box
+                        sx={{
+                          color: 'primary.main',
+                          mb: 2,
+                          p: 1.5,
+                          borderRadius: 2,
+                          bgcolor: alpha(theme.palette.primary.main, 0.08),
+                          display: 'inline-flex',
+                          transition: theme.transitions.create(['background-color', 'transform'], {
+                            duration: theme.transitions.duration.short,
+                          }),
+                        }}
+                      >
+                        {service.icon}
+                      </Box>
+                      <Typography variant="h6" gutterBottom>
+                        {service.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {service.description}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grow>
               </Grid>
             ))}
           </Grid>
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Box sx={{ textAlign: 'center', mt: 5 }}>
             <Button
               variant="outlined"
               color="primary"
@@ -264,43 +346,77 @@ export function Home() {
         </Container>
       </Box>
 
-      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: 'grey.50' }}>
+      {/* Reviews Section */}
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: 'grey.50' }}>
         <Container maxWidth="lg">
-          <Typography variant="h2" align="center" gutterBottom>
-            What Our Clients Say
-          </Typography>
-          <Typography
-            variant="body1"
-            align="center"
-            color="text.secondary"
-            sx={{ mb: 6, maxWidth: 600, mx: 'auto' }}
-          >
-            We take pride in building lasting relationships with businesses throughout Hunt County.
-          </Typography>
+          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
+            <Typography
+              variant="overline"
+              sx={{ color: 'primary.main', display: 'block', mb: 1 }}
+            >
+              Testimonials
+            </Typography>
+            <Typography variant="h2" gutterBottom>
+              What Our Clients Say
+            </Typography>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ maxWidth: 600, mx: 'auto' }}
+            >
+              We take pride in building lasting relationships with businesses throughout Hunt County.
+            </Typography>
+          </Box>
           <Grid container spacing={4}>
-            {reviews.map((review) => (
+            {reviews.map((review, index) => (
               <Grid key={review.name} size={{ xs: 12, md: 4 }}>
-                <Card sx={{ height: '100%' }}>
-                  <CardContent sx={{ p: 3 }}>
-                    <Rating value={review.rating} readOnly icon={<StarIcon fontSize="small" />} />
-                    <Typography variant="body1" sx={{ my: 2, fontStyle: 'italic' }}>
-                      "{review.text}"
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Avatar sx={{ bgcolor: 'primary.main' }}>{review.name[0]}</Avatar>
-                      <Box>
-                        <Typography variant="subtitle2">{review.name}</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {review.business}
-                        </Typography>
+                <Fade in timeout={600 + index * 150}>
+                  <Card sx={{ height: '100%' }}>
+                    <CardContent>
+                      <Rating
+                        value={review.rating}
+                        readOnly
+                        icon={<StarIcon fontSize="small" sx={{ color: '#faaf00' }} />}
+                        emptyIcon={<StarIcon fontSize="small" />}
+                      />
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          my: 2.5,
+                          fontStyle: 'italic',
+                          color: 'text.secondary',
+                          lineHeight: 1.7,
+                        }}
+                      >
+                        "{review.text}"
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Avatar
+                          sx={{
+                            bgcolor: 'primary.main',
+                            width: 44,
+                            height: 44,
+                            fontSize: '1.1rem',
+                          }}
+                        >
+                          {review.name[0]}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                            {review.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {review.business}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Fade>
               </Grid>
             ))}
           </Grid>
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Box sx={{ textAlign: 'center', mt: 5 }}>
             <Button
               variant="outlined"
               color="primary"
@@ -315,29 +431,47 @@ export function Home() {
         </Container>
       </Box>
 
-      <Box sx={{ py: { xs: 6, md: 10 } }}>
+      {/* Gallery Preview */}
+      <Box sx={{ py: { xs: 8, md: 12 } }}>
         <Container maxWidth="lg">
-          <Typography variant="h2" align="center" gutterBottom>
-            See Our Work
-          </Typography>
-          <Typography
-            variant="body1"
-            align="center"
-            color="text.secondary"
-            sx={{ mb: 6, maxWidth: 600, mx: 'auto' }}
-          >
-            Browse photos of the commercial spaces we keep spotless throughout the Greenville area.
-          </Typography>
+          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
+            <Typography
+              variant="overline"
+              sx={{ color: 'primary.main', display: 'block', mb: 1 }}
+            >
+              Our Work
+            </Typography>
+            <Typography variant="h2" gutterBottom>
+              See Our Work
+            </Typography>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ maxWidth: 600, mx: 'auto' }}
+            >
+              Browse photos of the commercial spaces we keep spotless throughout the Greenville area.
+            </Typography>
+          </Box>
           <Grid container spacing={2}>
             {[1, 2, 3, 4, 5, 6].map((item) => (
               <Grid key={item} size={{ xs: 6, md: 4 }}>
                 <Paper
                   sx={{
                     height: { xs: 150, md: 200 },
-                    bgcolor: 'grey.200',
+                    bgcolor: 'grey.100',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    transition: theme.transitions.create(['transform', 'box-shadow'], {
+                      duration: theme.transitions.duration.short,
+                    }),
+                    '&:hover': {
+                      transform: 'scale(1.02)',
+                      boxShadow: theme.shadows[4],
+                    },
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">
@@ -347,7 +481,7 @@ export function Home() {
               </Grid>
             ))}
           </Grid>
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Box sx={{ textAlign: 'center', mt: 5 }}>
             <Button
               variant="outlined"
               color="primary"
@@ -362,29 +496,33 @@ export function Home() {
         </Container>
       </Box>
 
-      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: 'grey.50' }}>
+      {/* FAQ Section */}
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: 'grey.50' }}>
         <Container maxWidth="md">
-          <Typography variant="h2" align="center" gutterBottom>
-            Frequently Asked Questions
-          </Typography>
-          <Typography
-            variant="body1"
-            align="center"
-            color="text.secondary"
-            sx={{ mb: 6 }}
-          >
-            Get answers to common questions about our commercial cleaning services.
-          </Typography>
+          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
+            <Typography
+              variant="overline"
+              sx={{ color: 'primary.main', display: 'block', mb: 1 }}
+            >
+              FAQ
+            </Typography>
+            <Typography variant="h2" gutterBottom>
+              Frequently Asked Questions
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Get answers to common questions about our commercial cleaning services.
+            </Typography>
+          </Box>
           <Box>
             {faqs.map((faq) => (
-              <Accordion key={faq.question} elevation={0} sx={{ mb: 1 }}>
+              <Accordion key={faq.question}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography variant="subtitle1" fontWeight={500}>
                     {faq.question}
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
                     {faq.answer}
                   </Typography>
                 </AccordionDetails>
@@ -394,53 +532,80 @@ export function Home() {
         </Container>
       </Box>
 
+      {/* Final CTA */}
       <Box
         sx={{
-          py: { xs: 8, md: 10 },
-          bgcolor: 'primary.main',
+          py: { xs: 10, md: 12 },
+          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
           color: 'white',
           textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              'radial-gradient(circle at 30% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+            pointerEvents: 'none',
+          },
         }}
       >
-        <Container maxWidth="md">
-          <Typography variant="h2" gutterBottom sx={{ color: 'white' }}>
-            Ready for a Cleaner Workspace?
-          </Typography>
-          <Typography variant="h6" sx={{ mb: 4, fontWeight: 400, opacity: 0.95 }}>
-            Get a free, no-obligation quote for your commercial cleaning needs. We respond within
-            one business day.
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="large"
-              component={Link}
-              to="/contact"
-              sx={{ px: 5, py: 1.5 }}
-            >
-              Request a Quote
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              component="a"
-              href={`tel:${BUSINESS_INFO.phone}`}
-              startIcon={<PhoneIcon />}
-              sx={{
-                px: 4,
-                py: 1.5,
-                color: 'white',
-                borderColor: 'white',
-                '&:hover': {
-                  borderColor: 'white',
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                },
-              }}
-            >
-              Call {BUSINESS_INFO.phoneFormatted}
-            </Button>
-          </Box>
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+          <Fade in timeout={600}>
+            <Box>
+              <Typography
+                variant="h2"
+                gutterBottom
+                sx={{ color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+              >
+                Ready for a Cleaner Workspace?
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{ mb: 4, fontWeight: 400, opacity: 0.95, lineHeight: 1.6 }}
+              >
+                Get a free, no-obligation quote for your commercial cleaning needs. We respond within
+                one business day.
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  component={Link}
+                  to="/contact"
+                  sx={{ px: 5, py: 1.5 }}
+                >
+                  Request a Quote
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  component="a"
+                  href={`tel:${BUSINESS_INFO.phone}`}
+                  startIcon={<PhoneIcon />}
+                  sx={{
+                    px: 4,
+                    py: 1.5,
+                    color: 'white',
+                    borderColor: 'rgba(255,255,255,0.5)',
+                    borderWidth: 2,
+                    '&:hover': {
+                      borderColor: 'white',
+                      borderWidth: 2,
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                    },
+                  }}
+                >
+                  Call {BUSINESS_INFO.phoneFormatted}
+                </Button>
+              </Box>
+            </Box>
+          </Fade>
         </Container>
       </Box>
     </>
