@@ -13,7 +13,6 @@ import {
   ListItemButton,
   ListItemText,
   Toolbar,
-  Typography,
   useMediaQuery,
   useScrollTrigger,
   useTheme,
@@ -53,17 +52,26 @@ export function Header() {
 
   const drawer = (
     <Box sx={{ textAlign: 'center', py: 2 }}>
-      <Typography
-        variant="h6"
+      <Box
+        component={Link}
+        to="/"
         sx={{
+          display: 'block',
           my: 2,
-          fontWeight: 700,
-          color: 'primary.main',
-          letterSpacing: '-0.01em',
+          textDecoration: 'none',
         }}
       >
-        3MS Janitorial
-      </Typography>
+        <Box
+          component="img"
+          src="/logo.jpeg"
+          alt="3M's Janitorial Service"
+          sx={{
+            height: 70,
+            width: 'auto',
+            maxWidth: '100%',
+          }}
+        />
+      </Box>
       <List sx={{ px: 1 }}>
         {navItems.map((item) => (
           <ListItem key={item.path} disablePadding>
@@ -140,32 +148,37 @@ export function Header() {
             disableGutters
             sx={{
               justifyContent: 'space-between',
-              minHeight: { xs: 64, md: 72 },
+              minHeight: { xs: 80, md: 100 },
               transition: theme.transitions.create('min-height', {
                 duration: theme.transitions.duration.short,
               }),
             }}
           >
-            <Typography
-              variant="h6"
+            <Box
               component={Link}
               to="/"
               sx={{
-                fontWeight: 700,
-                color: 'primary.main',
+                display: 'flex',
+                alignItems: 'center',
                 textDecoration: 'none',
-                fontSize: { xs: '1.1rem', md: '1.25rem' },
-                letterSpacing: '-0.01em',
-                transition: theme.transitions.create('color', {
+                transition: theme.transitions.create('opacity', {
                   duration: theme.transitions.duration.short,
                 }),
                 '&:hover': {
-                  color: 'primary.dark',
+                  opacity: 0.85,
                 },
               }}
             >
-              3MS Janitorial
-            </Typography>
+              <Box
+                component="img"
+                src="/logo.jpeg"
+                alt="3M's Janitorial Service"
+                sx={{
+                  height: { xs: 70, md: 90 },
+                  width: 'auto',
+                }}
+              />
+            </Box>
 
             {isMobile ? (
               <IconButton
