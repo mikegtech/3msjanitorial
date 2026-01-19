@@ -1,0 +1,34 @@
+# =============================================================================
+# Traefik Dynamic Configuration - Services & Routers
+# =============================================================================
+# Explicit service definitions (backup for Docker provider)
+# =============================================================================
+
+http:
+  # ---------------------------------------------------------------------------
+  # Routers
+  # ---------------------------------------------------------------------------
+  routers:
+    # Web application router
+    web:
+      rule: "Host(`3msjanitorial.com`) || Host(`www.3msjanitorial.com`)"
+      entryPoints:
+        - web
+      service: web
+      middlewares:
+        - security-headers
+        - compress
+
+  # ---------------------------------------------------------------------------
+  # Services
+  # ---------------------------------------------------------------------------
+  services:
+    # Web application (static React build)
+    web:
+      loadBalancer:
+        servers:
+          - url: "http://3ms-web:80"
+        healthCheck:
+          path: /
+          interval: 30s
+          timeout: 5s

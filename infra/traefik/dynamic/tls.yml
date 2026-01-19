@@ -2,12 +2,13 @@
 # Traefik Dynamic Configuration - TLS
 # =============================================================================
 # TLS options and certificate configuration
-# Note: When using Cloudflare Tunnel, TLS is handled at Cloudflare edge
+# Note: With Cloudflare Tunnel, TLS is terminated at Cloudflare edge.
+# Traefik receives HTTP from cloudflared, so no certs needed here.
 # =============================================================================
 
 tls:
   # ---------------------------------------------------------------------------
-  # TLS Options
+  # TLS Options (used if direct HTTPS access is needed)
   # ---------------------------------------------------------------------------
   options:
     # Modern TLS configuration (TLS 1.3 only)
@@ -27,22 +28,7 @@ tls:
         - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
       sniStrict: true
 
-  # ---------------------------------------------------------------------------
-  # Default Certificate Store
-  # ---------------------------------------------------------------------------
-  stores:
-    default:
-      defaultGeneratedCert:
-        resolver: letsencrypt
-        domain:
-          main: "3msjanitorial.com"
-          sans:
-            - "*.3msjanitorial.com"
-
 # =============================================================================
-# Certificate Resolvers (Let's Encrypt)
-# =============================================================================
-# Configured in traefik.yml static config with:
-#   email: info@3msjanitorial.com
-#   resolver: letsencrypt
+# Note: Let's Encrypt certificates are configured in traefik.yml
+# With Cloudflare Tunnel, certs are optional since CF terminates TLS.
 # =============================================================================
