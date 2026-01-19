@@ -1,0 +1,143 @@
+# =============================================================================
+# Promtail Configuration
+# =============================================================================
+# Collects logs from Docker containers and ships to Loki
+# Documentation: https://grafana.com/docs/loki/latest/clients/promtail/
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Server Configuration
+# -----------------------------------------------------------------------------
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+# -----------------------------------------------------------------------------
+# Position Tracking
+# -----------------------------------------------------------------------------
+positions:
+  filename: /tmp/positions.yaml
+
+# -----------------------------------------------------------------------------
+# Loki Client Configuration
+# -----------------------------------------------------------------------------
+clients:
+  - url: ${LOKI_URL:-http://loki:3100/loki/api/v1/push}
+    tenant_id: 3msjanitorial
+    batchwait: 1s
+    batchsize: 1048576
+    timeout: 10s
+    backoff_config:
+      min_period: 500ms
+      max_period: 5m
+      max_retries: 10
+
+# -----------------------------------------------------------------------------
+# Scrape Configurations
+# -----------------------------------------------------------------------------
+scrape_configs:
+  # ---------------------------------------------------------------------------
+  # Docker Container Logs
+  # ---------------------------------------------------------------------------
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      # Only collect logs from containers with logging enabled
+      - source_labels: ['__meta_docker_container_label_logging']
+        regex: 'false'
+        action: drop
+      
+      # Use container name as job label
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: container
+      
+      # Extract compose service name
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: service
+      
+      # Extract compose project name
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
+        target_label: project
+      
+      # Keep container ID
+      - source_labels: ['__meta_docker_container_id']
+        target_label: container_id
+
+    pipeline_stages:
+      # Parse JSON logs (common for Node.js, Python apps)
+      - json:
+          expressions:
+            level: level
+            message: message
+            timestamp: timestamp
+            error: error
+      
+      # Set log level from parsed JSON
+      - labels:
+          level:
+      
+      # Parse timestamp if present
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano
+          fallback_formats:
+            - RFC3339
+            - UnixMs
+      
+      # Extract error stack traces
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}|^\[|^{'
+          max_lines: 128
+          max_wait_time: 3s
+
+  # ---------------------------------------------------------------------------
+  # Traefik Access Logs (if file logging is enabled)
+  # ---------------------------------------------------------------------------
+  - job_name: traefik
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: traefik
+          service: traefik
+          __path__: /var/log/traefik/*.log
+    
+    pipeline_stages:
+      # Parse Traefik JSON access logs
+      - json:
+          expressions:
+            method: RequestMethod
+            path: RequestPath
+            status: DownstreamStatus
+            duration: Duration
+            client_ip: ClientAddr
+            router: RouterName
+            service: ServiceName
+      
+      - labels:
+          method:
+          status:
+          router:
+      
+      # Calculate request duration in milliseconds
+      - template:
+          source: duration
+          template: '{{ div .Value 1000000 }}'
+      
+      - labels:
+          duration_ms: duration
+
+  # ---------------------------------------------------------------------------
+  # System Journal (optional)
+  # ---------------------------------------------------------------------------
+  # - job_name: journal
+  #   journal:
+  #     max_age: 12h
+  #     labels:
+  #       job: systemd-journal
+  #   relabel_configs:
+  #     - source_labels: ['__journal__systemd_unit']
+  #       target_label: unit

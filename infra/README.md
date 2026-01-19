@@ -48,10 +48,10 @@ Traefik serves as the reverse proxy and handles:
 - Request rate limiting
 - Security headers middleware
 
-Configuration files (to be added):
-- `traefik.yml` - Static configuration
-- `dynamic/` - Dynamic configuration for services
-- `docker-compose.yml` - Traefik container setup
+Configuration files:
+- `traefik.yml` - Static configuration (entrypoints, providers, logging)
+- `dynamic/middlewares.yml` - Reusable middleware (security headers, rate limiting, CORS)
+- `dynamic/tls.yml` - TLS options and certificate configuration
 
 #### Promtail (`/promtail`)
 
@@ -60,9 +60,8 @@ Promtail collects and ships logs to Loki:
 - Traefik access logs
 - System logs
 
-Configuration files (to be added):
-- `promtail.yml` - Log collection configuration
-- Labels for service identification
+Configuration files:
+- `promtail.yml` - Log collection with Docker service discovery
 
 ### Cloudflare Tunnel
 
@@ -97,13 +96,63 @@ Setup steps (Phase 5):
 
 | Phase | Components | Status |
 |-------|------------|--------|
-| Phase 1 | Local development only | Current |
+| Phase 1 | Local development only | Complete |
 | Phase 2 | API deployment | Planned |
 | Phase 3 | Full stack with calendar | Planned |
 | Phase 4 | Agent service + Auth0 | Planned |
 | Phase 5 | Observability + monitoring | Planned |
 
-## Local Development
+## Quick Start
+
+### 1. Copy Environment File
+
+```bash
+cp .env.example .env
+# Edit .env with your values
+```
+
+### 2. Start Infrastructure (Development)
+
+```bash
+cd infra
+docker compose up -d
+```
+
+This starts:
+- **Traefik** on ports 8880 (HTTP), 8443 (HTTPS), 9080 (Dashboard)
+- **Promtail** for log collection
+
+### 3. Access Services
+
+| Service | URL |
+|---------|-----|
+| Traefik Dashboard | http://localhost:9080/dashboard/ |
+| Web App (when enabled) | http://localhost:8880 |
+
+### 4. View Logs
+
+```bash
+docker compose logs -f traefik
+docker compose logs -f promtail
+```
+
+### 5. Stop Infrastructure
+
+```bash
+docker compose down
+```
+
+## Port Mapping
+
+Since ports 80/443 are in use on the host, development uses alternate ports:
+
+| Service | Internal Port | Host Port |
+|---------|---------------|-----------|
+| Traefik HTTP | 80 | 8880 |
+| Traefik HTTPS | 443 | 8443 |
+| Traefik Dashboard | 8080 | 9080 |
+
+## Local Development (Without Docker)
 
 For local development, use the monorepo's development server:
 

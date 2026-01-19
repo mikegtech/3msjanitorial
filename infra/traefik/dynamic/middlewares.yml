@@ -1,0 +1,130 @@
+# =============================================================================
+# Traefik Dynamic Configuration - Middlewares
+# =============================================================================
+# Reusable middleware definitions for all services
+# =============================================================================
+
+http:
+  middlewares:
+    # ---------------------------------------------------------------------------
+    # Security Headers
+    # ---------------------------------------------------------------------------
+    security-headers:
+      headers:
+        # HSTS - Force HTTPS
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        # Prevent clickjacking
+        frameDeny: true
+        # Prevent MIME type sniffing
+        contentTypeNosniff: true
+        # XSS Protection
+        browserXssFilter: true
+        # Referrer Policy
+        referrerPolicy: "strict-origin-when-cross-origin"
+        # Content Security Policy (customize as needed)
+        contentSecurityPolicy: |
+          default-src 'self';
+          script-src 'self' 'unsafe-inline' 'unsafe-eval';
+          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+          font-src 'self' https://fonts.gstatic.com;
+          img-src 'self' data: https:;
+          connect-src 'self' https://api.3msjanitorial.com;
+        # Permissions Policy
+        permissionsPolicy: "geolocation=(), microphone=(), camera=()"
+
+    # ---------------------------------------------------------------------------
+    # Rate Limiting
+    # ---------------------------------------------------------------------------
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1m
+
+    rate-limit-strict:
+      rateLimit:
+        average: 10
+        burst: 20
+        period: 1m
+
+    # ---------------------------------------------------------------------------
+    # Compression
+    # ---------------------------------------------------------------------------
+    compress:
+      compress:
+        excludedContentTypes:
+          - text/event-stream
+
+    # ---------------------------------------------------------------------------
+    # Strip Prefixes
+    # ---------------------------------------------------------------------------
+    strip-api-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api"
+
+    strip-agent-prefix:
+      stripPrefix:
+        prefixes:
+          - "/agent"
+
+    # ---------------------------------------------------------------------------
+    # CORS (for API)
+    # ---------------------------------------------------------------------------
+    cors-api:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Content-Type
+          - Authorization
+          - X-Requested-With
+        accessControlAllowOriginList:
+          - "https://3msjanitorial.com"
+          - "https://www.3msjanitorial.com"
+          - "http://localhost:3000"
+        accessControlMaxAge: 86400
+        addVaryHeader: true
+
+    # ---------------------------------------------------------------------------
+    # Basic Auth (for admin endpoints)
+    # ---------------------------------------------------------------------------
+    # Use htpasswd to generate: htpasswd -nb user password
+    # Then escape $ as $$ for docker-compose
+    # admin-auth:
+    #   basicAuth:
+    #     users:
+    #       - "admin:$$apr1$$..."
+
+    # ---------------------------------------------------------------------------
+    # IP Whitelist (for admin/internal services)
+    # ---------------------------------------------------------------------------
+    # internal-only:
+    #   ipWhiteList:
+    #     sourceRange:
+    #       - "10.0.0.0/8"
+    #       - "172.16.0.0/12"
+    #       - "192.168.0.0/16"
+    #       - "127.0.0.1/32"
+
+    # ---------------------------------------------------------------------------
+    # Retry (for resilience)
+    # ---------------------------------------------------------------------------
+    retry:
+      retry:
+        attempts: 3
+        initialInterval: 100ms
+
+    # ---------------------------------------------------------------------------
+    # Circuit Breaker
+    # ---------------------------------------------------------------------------
+    circuit-breaker:
+      circuitBreaker:
+        expression: "NetworkErrorRatio() > 0.30 || ResponseCodeRatio(500, 600, 0, 600) > 0.25"

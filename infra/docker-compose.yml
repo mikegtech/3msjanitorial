@@ -1,0 +1,182 @@
+# =============================================================================
+# 3MS Janitorial - Infrastructure Docker Compose
+# =============================================================================
+# Usage:
+#   Development:  docker compose up -d
+#   Production:   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   Logs:         docker compose logs -f traefik
+#   Stop:         docker compose down
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Traefik - Reverse Proxy & Load Balancer
+  # ---------------------------------------------------------------------------
+  traefik:
+    image: traefik:v3.2
+    container_name: 3ms-traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      # HTTP entrypoint (dev) - 80/443 are in use on host
+      - "8880:80"
+      # HTTPS entrypoint (dev)
+      - "8443:443"
+      # Dashboard
+      - "9080:8080"
+    volumes:
+      # Traefik static configuration
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      # Dynamic configuration
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      # Docker socket for service discovery
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Certificates (Let's Encrypt)
+      - traefik-certs:/letsencrypt
+    networks:
+      - traefik-public
+      - internal
+    labels:
+      - "traefik.enable=true"
+      # Dashboard routing (accessible at http://localhost:9080/dashboard/)
+      - "traefik.http.routers.traefik-dashboard.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=dashboard"
+    environment:
+      - TZ=America/Chicago
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # ---------------------------------------------------------------------------
+  # Promtail - Log Collector (Phase 5)
+  # ---------------------------------------------------------------------------
+  # promtail:
+  #   image: grafana/promtail:3.0.0
+  #   container_name: 3ms-promtail
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./promtail/promtail.yml:/etc/promtail/promtail.yml:ro
+  #     # Docker container logs
+  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     # Traefik access logs (if file logging enabled)
+  #     - traefik-logs:/var/log/traefik:ro
+  #   networks:
+  #     - internal
+  #   command: -config.file=/etc/promtail/promtail.yml
+  #   depends_on:
+  #     - traefik
+
+  # ---------------------------------------------------------------------------
+  # Cloudflare Tunnel
+  # ---------------------------------------------------------------------------
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: 3ms-cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - traefik-public
+    depends_on:
+      - traefik
+
+  # ---------------------------------------------------------------------------
+  # Application Services
+  # ---------------------------------------------------------------------------
+  
+  # Web App - Static React build served by Caddy
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+    container_name: 3ms-web
+    restart: unless-stopped
+    networks:
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.web.entrypoints=web,websecure"
+      - "traefik.http.routers.web.tls=true"
+      - "traefik.http.routers.web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.web.loadbalancer.server.port=80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API - NestJS Application
+  # api:
+  #   build:
+  #     context: ../apps/api
+  #     dockerfile: Dockerfile
+  #   container_name: 3ms-api
+  #   restart: unless-stopped
+  #   networks:
+  #     - internal
+  #   environment:
+  #     - NODE_ENV=production
+  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+  #     - REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
+  #     - "traefik.http.routers.api.entrypoints=web,websecure"
+  #     - "traefik.http.services.api.loadbalancer.server.port=4000"
+  #     - "traefik.http.routers.api.middlewares=api-stripprefix"
+  #     - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
+  #   healthcheck:
+  #     test: ["CMD", "wget", "-q", "--spider", "http://localhost:4000/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+
+  # Agent - Python AI Service
+  # agent:
+  #   build:
+  #     context: ../apps/agent
+  #     dockerfile: Dockerfile
+  #   container_name: 3ms-agent
+  #   restart: unless-stopped
+  #   networks:
+  #     - internal
+  #   environment:
+  #     - ENVIRONMENT=production
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.agent.rule=Host(`${DOMAIN}`) && PathPrefix(`/agent`)"
+  #     - "traefik.http.routers.agent.entrypoints=web,websecure"
+  #     - "traefik.http.services.agent.loadbalancer.server.port=5000"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+
+# -----------------------------------------------------------------------------
+# Networks
+# -----------------------------------------------------------------------------
+networks:
+  # Public network for Traefik and Cloudflare Tunnel
+  traefik-public:
+    name: traefik-public
+  # Internal network for service-to-service communication
+  internal:
+    name: 3ms-internal
+
+# -----------------------------------------------------------------------------
+# Volumes
+# -----------------------------------------------------------------------------
+volumes:
+  traefik-certs:
+    name: 3ms-traefik-certs
+  traefik-logs:
+    name: 3ms-traefik-logs

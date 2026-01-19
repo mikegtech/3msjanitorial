@@ -1,0 +1,25 @@
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.csr
+acme.json
+
+# Docker volumes data (if mounted locally)
+data/
+
+# Secrets directory
+secrets/
+
+# Backup files
+*.bak
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
