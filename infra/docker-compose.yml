@@ -91,11 +91,11 @@ services:
   # Application Services
   # ---------------------------------------------------------------------------
   
-  # Web App - Static React build served by Caddy
+  # Web App - Static React build served by nginx
   web:
     build:
-      context: ../apps/web
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: apps/web/Dockerfile
     container_name: 3ms-web
     restart: unless-stopped
     networks:
