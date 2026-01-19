@@ -1,0 +1,39 @@
+{
+  "name": "@3msjanitorial/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared Zod schemas and type contracts for 3MS Janitorial",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./lead": {
+      "import": "./dist/lead.js",
+      "types": "./dist/lead.d.ts"
+    },
+    "./schedule": {
+      "import": "./dist/schedule.js",
+      "types": "./dist/schedule.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --write src/",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
